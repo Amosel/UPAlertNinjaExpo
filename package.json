@@ -10,8 +10,8 @@
   "dependencies": {
     "@expo/react-native-action-sheet": "^3.8.0",
     "@react-native-community/masked-view": "0.1.10",
-    "@react-navigation/native": "^5.8.6",
-    "@react-navigation/stack": "^5.12.3",
+    "@react-navigation/native": "^5.8.8",
+    "@react-navigation/stack": "^5.12.5",
     "expo": "~39.0.2",
     "expo-av": "~8.6.0",
     "expo-status-bar": "~1.0.2",
