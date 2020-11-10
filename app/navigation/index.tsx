@@ -1,102 +1,107 @@
-// import React from 'react';
-// import {createStackNavigator} from 'react-navigation-stack';
-// import {createAppContainer, createSwitchNavigator} from 'react-navigation';
-// import * as Screens from '../screens';
-// import {DismissButton, SettingsButton} from '../components';
-// import {colors} from '../styles';
+import React from "react";
+import { View, Text } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import * as Screens from "../screens";
+import { DismissButton, SettingsButton } from "../components";
+import { colors } from "../styles";
+import {useCredentials} from '../provider';
 
-// const HomeStack = createStackNavigator({
-//   Home: {
-//     screen: Screens.HomeScreen,
-//     navigationOptions: () => ({
-//       title: 'Orders',
-//       headerRight: <SettingsButton />,
-//       headerTintColor: colors.WHITE,
-//       headerBackTitle: null,
-//       headerStyle: {
-//         backgroundColor: colors.PRIMARYBGCOLOR,
-//         borderBottomWidth: 0,
-//       },
-//     }),
-//   },
-//   Details: {
-//     screen: Screens.DetailsScreen,
-//     navigationOptions: () => ({
-//       headerTintColor: colors.WHITE,
-//       headerBackTitle: null,
-//       headerStyle: {
-//         backgroundColor: colors.PRIMARYBGCOLOR,
-//         borderBottomWidth: 0,
-//       },
-//     }),
-//   },
-// });
-
-// const SettingsStack = createStackNavigator({
-//   SettingsHome: {
-//     screen: Screens.SettingsScreen,
-//     navigationOptions: () => ({
-//       headerRight: <DismissButton />,
-//       headerTintColor: colors.WHITE,
-//       headerBackTitle: null,
-//       headerStyle: {
-//         backgroundColor: colors.PRIMARYBGCOLOR,
-//       },
-//     }),
-//   },
-//   PrivacyPolicy: {
-//     screen: Screens.PrivacyPolicyScreen,
-//     navigationOptions: () => ({
-//       headerTintColor: colors.WHITE,
-//       headerBackTitle: null,
-//       headerStyle: {
-//         backgroundColor: colors.PRIMARYBGCOLOR,
-//         borderBottomWidth: 0,
-//       },
-//     }),
-//   },
-// });
-
-// const AppStack = createStackNavigator(
-//   {
-//     Home: {
-//       screen: HomeStack,
-//     },
-//     Settings: {screen: SettingsStack},
-//   },
-//   {
-//     mode: 'modal',
-//     headerMode: 'none',
-//   },
-// );
-
-// export const Root = createAppContainer(
-//   createSwitchNavigator({
-//     Initial: Screens.InitializingScreen,
-//     App: AppStack,
-//   }),
-// );
-import React from 'react'
-import { View, Text } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-
-function HomeScreen() {
+function HomeStack() {
+  const { Screen, Navigator } = createStackNavigator();
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Home Screen</Text>
-    </View>
+    <Navigator>
+      <Screen
+        name="Home"
+        component={Screens.HomeScreen}
+        options={{
+          title: "Orders",
+          headerRight: () => <SettingsButton />,
+          headerTintColor: colors.WHITE,
+          headerBackTitle: undefined,
+          headerStyle: {
+            backgroundColor: colors.PRIMARYBGCOLOR,
+            borderBottomWidth: 0,
+          },
+        }}
+      />
+    </Navigator>
   );
 }
 
-const Stack = createStackNavigator();
+function SettingsStack() {
+  const { Screen, Navigator } = createStackNavigator();
+  return (
+    <Navigator>
+      <Screen
+        name="SettingsHome"
+        component={Screens.SettingsScreen}
+        options={{
+          headerRight: () => <DismissButton />,
+          headerTintColor: colors.WHITE,
+          headerBackTitle: undefined,
+          headerStyle: {
+            backgroundColor: colors.PRIMARYBGCOLOR,
+          },
+          headerLeft: undefined,
+        }}
+      />
+      <Screen
+        name="PrivacyPolicy"
+        component={Screens.PrivacyPolicyScreen}
+        options={{
+          headerTintColor: colors.WHITE,
+          headerBackTitle: undefined,
+          headerStyle: {
+            backgroundColor: colors.PRIMARYBGCOLOR,
+            borderBottomWidth: 0,
+          },
+        }}
+      />
+    </Navigator>
+  );
+}
+
+function AppStack() {
+  const { Screen, Navigator } = createStackNavigator();
+  return (
+    <Navigator mode="modal" screenOptions={{}}>
+      <Screen
+        name={"Home"}
+        component={HomeStack}
+        options={{ headerShown: false }}
+      />
+      <Screen
+        name={"Settings"}
+        component={SettingsStack}
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Navigator>
+  );
+}
 
 export function Root() {
+  const { Navigator, Screen } = createStackNavigator();
+  const credentials = useCredentials();
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} />
-      </Stack.Navigator>
+      <Navigator mode="modal">
+        {credentials ? (
+          <Screen
+            name={"Home"}
+            component={AppStack}
+            options={{ headerShown: false }}
+          />
+        ) : (
+          <Screen
+            name={"Settings"}
+            component={SettingsStack}
+            options={{ headerShown: false }}
+          />
+        )}
+      </Navigator>
     </NavigationContainer>
   );
 }
