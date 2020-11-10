@@ -2498,6 +2498,14 @@ expo-asset@~8.2.0:
     path-browserify "^1.0.0"
     url-parse "^1.4.4"
 
+expo-av@~8.6.0:
+  version "8.6.0"
+  resolved "https://registry.yarnpkg.com/expo-av/-/expo-av-8.6.0.tgz#ab434c05241c1dcdca0edd57acb03aa21a3e46cc"
+  integrity sha512-ZZJtCLCDigeDMu2fyv76Kyifu2quhTn6ViYjM2ku/HvFSvUxlb5kK9imuLog3kR+LRxeIiVS9F29r3PCOqI+rQ==
+  dependencies:
+    lodash "^4.17.15"
+    nullthrows "^1.1.0"
+
 expo-constants@~9.2.0:
   version "9.2.0"
   resolved "https://registry.yarnpkg.com/expo-constants/-/expo-constants-9.2.0.tgz#e86a38793deaff9018878afac65bce2543c80a4c"
@@ -4104,6 +4112,11 @@ mkdirp@^0.5.1:
   integrity sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ==
   dependencies:
     minimist "^1.2.5"
+
+mobx-state-tree@^3.17.2:
+  version "3.17.2"
+  resolved "https://registry.yarnpkg.com/mobx-state-tree/-/mobx-state-tree-3.17.2.tgz#130ab4d450fc4dd6e2571b7385af1350c82def37"
+  integrity sha512-X0+xO7yEvBvPmLU2Z6cp81sD0xQaMXgLD4lGZoKSasOhNJSQPyKlu/LFxJTS6Wgw7J3gkWq9MMfQ4pO6wGMVfw==
 
 ms@2.0.0:
   version "2.0.0"
