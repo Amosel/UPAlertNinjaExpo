@@ -5,7 +5,7 @@ import {OrderKeyExtractor} from '../model';
 import {OrderItem} from './order-item';
 import styles, {colors} from '../styles';
 import {OrderListEmptyComponent} from './empty-orders-list-view';
-import {useNavigation} from 'react-navigation-hooks';
+import {useNavigation} from '@react-navigation/native';
 import {OrderFilterButton} from './order-filter-button';
 import {observer} from 'mobx-react';
 import {useOrdersStore} from '../provider';

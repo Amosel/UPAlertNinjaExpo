@@ -2,7 +2,7 @@
 import React from 'react';
 import {View} from 'react-native';
 import {useCredentials} from '../provider';
-import {useNavigation} from 'react-navigation-hooks';
+import {useNavigation} from '@react-navigation/native';
 
 export function InitializingScreen() {
   const credentials = useCredentials();

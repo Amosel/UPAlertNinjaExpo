@@ -1,13 +1,13 @@
 import React from 'react';
 import {TouchableOpacity, Text} from 'react-native';
-import {useNavigation} from 'react-navigation-hooks';
+import {useNavigation} from '@react-navigation/native';
 import styles from '../styles';
 
 export function DismissButton() {
-  const {dismiss} = useNavigation();
+  const {goBack} = useNavigation();
 
   return (
-    <TouchableOpacity onPress={() => dismiss()}>
+    <TouchableOpacity onPress={() => goBack()}>
       <Text style={styles.dismissText}>Cancel</Text>
     </TouchableOpacity>
   );

@@ -2,7 +2,7 @@
 import React from 'react';
 import {SafeAreaView, Image, Text, View} from 'react-native';
 import {Button} from 'react-native-elements';
-import {useNavigation} from 'react-navigation-hooks';
+import {useNavigation} from '@react-navigation/native';
 import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-view';
 import {observer} from 'mobx-react';
 import {useKeyboard} from '../hooks';

@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {SafeAreaView, Text, View, FlatList, Image} from 'react-native';
-import {useNavigation} from 'react-navigation-hooks';
+import {useNavigation} from '@react-navigation/native';
 import {Button} from 'react-native-elements';
 import styles, {colors} from '../styles';
 import {useOrdersStore} from '../provider';
