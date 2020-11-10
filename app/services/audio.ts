@@ -1,53 +1,56 @@
-import {Platform} from 'react-native';
-import Sound from 'react-native-sound';
+import { Platform } from "react-native";
+import { Audio, AVPlaybackStatus } from "expo-av";
 
 export async function checkForAudio() {
-  Sound.setCategory('Alarm', false);
-}
-
-let alertSound: Sound;
-
-export async function playSound() {
-  if (alertSound) {
-    return;
-  }
-  alertSound = new Sound(
-    Platform.select({ios: 'alert.caf', android: 'alert.mp3'}),
-    Sound.MAIN_BUNDLE,
-    error => {
-      if (error) {
-        console.log('failed to load the sound', error);
-        return;
-      }
-      // loaded successfully
-      console.log(
-        'duration in seconds: ' +
-          alertSound.getDuration() +
-          'number of channels: ' +
-          alertSound.getNumberOfChannels(),
-      );
-
-      // Play the sound with an onEnd callback
-      alertSound.play(success => {
-        if (success) {
-          console.log('successfully finished playing');
-        } else {
-          console.log('playback failed due to audio decoding errors');
-        }
-      });
-    },
-  );
-  alertSound.play(() => {
-    alertSound.release();
+  await Audio.setAudioModeAsync({
+    playsInSilentModeIOS: true,
+    staysActiveInBackground: true,
+    interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DUCK_OTHERS,
+    interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
   });
 }
 
-export function pauseSound() {
-  if (alertSound && alertSound.isPlaying()) {
-    const _sound = alertSound;
-    alertSound = null;
-    _sound.pause(() => {
-      _sound.release();
-    });
+let alertSound: Audio.Sound | null = null;
+let status: AVPlaybackStatus | null = null;
+
+export async function playSound() {
+  if (alertSound == null) {
+    alertSound = new Audio.Sound();
+  }
+
+  try {
+    if (status == null || false == status.isLoaded) {
+      status = await alertSound.loadAsync(
+        Platform.select({
+          ios: require("../assets/alert.caf"),
+          android: require("../assets/alert.mp3"),
+        })
+      );
+    }
+
+    if (
+      status != null &&
+      status.isLoaded == true &&
+      status.isPlaying == false
+    ) {
+      status = await alertSound.playAsync();
+      // Your sound is playing!
+
+      console.log("successfully finished playing");
+      // Don't forget to unload the sound from memory
+      // when you are done using the Sound object
+      status = await alertSound.unloadAsync();
+    } else {
+      console.log("already playing, doing nothing");
+    }
+  } catch (error) {
+    console.log("failed to load the sound", error);
+    status = null;
+  }
+}
+
+export async function pauseSound() {
+  if (alertSound != null && status && status.isLoaded == true && status.isPlaying == true) {
+    status = await alertSound.pauseAsync()
   }
 }
