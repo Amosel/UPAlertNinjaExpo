@@ -1,22 +1,14 @@
 import Constants from 'expo-constants';
 import {PlatformName, UserObject} from '../types';
+import {Platform} from 'react-native';
 
 function getPlatform(): PlatformName {
-  if (Constants.platform.ios) {
-    if (Constants.isDevice) {
-      return 'ios';
-    } else {
-      return 'ios.simulator';
-    }
-  } else if (Constants.platform.android) {
-    if (Constants.isDevice) {
-      return 'android';
-    } else {
-      return 'android.simulator';
-    }
-  } else {
-    return 'unknown';
-  }
+  return (
+    Platform.select({
+      ios: Constants.isDevice ? 'ios' : 'ios.simulator',
+      android: Constants.isDevice ? 'android' : 'android.simulator',
+    }) || 'unknown'
+  );
 }
 
 export function firebaseUserObject(
