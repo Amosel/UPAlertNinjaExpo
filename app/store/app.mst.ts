@@ -123,7 +123,7 @@ type AppSnapshot = SnapshotIn<typeof App>;
 export async function restoreApp() {
   log('Restoring app');
   const [credentials, env] = await Promise.all([
-    restoreCredentials(),
+    restoreCredentials(true),
     getEnv(),
   ]);
   let snapshot: AppSnapshot = {

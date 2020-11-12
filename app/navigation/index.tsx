@@ -1,11 +1,11 @@
 import React from 'react';
-import {View, Text} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import * as Screens from '../screens';
 import {DismissButton, SettingsButton} from '../components';
 import {colors} from '../styles';
 import {useCredentials} from '../provider';
+import {observer} from 'mobx-react';
 
 function HomeStack() {
   const {Screen, Navigator} = createStackNavigator();
@@ -82,9 +82,10 @@ function AppStack() {
   );
 }
 
-export function Root() {
+export const Root = observer(() => {
   const {Navigator, Screen} = createStackNavigator();
   const credentials = useCredentials();
+  debugger;
   return (
     <NavigationContainer>
       <Navigator mode="modal">
@@ -97,11 +98,11 @@ export function Root() {
         ) : (
           <Screen
             name={'Settings'}
-            component={SettingsStack}
+            component={Screens.SettingsScreen}
             options={{headerShown: false}}
           />
         )}
       </Navigator>
     </NavigationContainer>
   );
-}
+});
