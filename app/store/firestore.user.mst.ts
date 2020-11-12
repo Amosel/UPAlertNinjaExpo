@@ -5,6 +5,18 @@ import {hasChanges} from '../model';
 
 const log = console.log;
 
+const firebaseConfig = {
+  apiKey: 'AIzaSyA9_m5hnq4x2Pz2HUiiSrUEmio4bui6yUU',
+  authDomain: 'restaurantninja-c36c4.firebaseapp.com',
+  databaseURL: 'https://restaurantninja-c36c4.firebaseio.com',
+  projectId: 'restaurantninja-c36c4',
+  storageBucket: 'restaurantninja-c36c4.appspot.com',
+  messagingSenderId: '162845958826',
+  appId: '1:162845958826:web:c812664b8771fbdc7be6d3',
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
 export const FirestoreUser = types
   .model('FirestoreUser', {
     state: types.optional(
