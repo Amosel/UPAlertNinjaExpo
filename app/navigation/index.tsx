@@ -85,7 +85,6 @@ function AppStack() {
 export const Root = observer(() => {
   const {Navigator, Screen} = createStackNavigator();
   const credentials = useCredentials();
-  debugger;
   return (
     <NavigationContainer>
       <Navigator mode="modal">
