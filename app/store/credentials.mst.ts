@@ -10,21 +10,12 @@ import {Platform} from 'react-native';
 const log = console.log;
 
 function getPlatform(): PlatformName {
-  if (Constants.platform.ios) {
-    if (Constants.isDevice) {
-      return 'ios';
-    } else {
-      return 'ios.simulator';
-    }
-  } else if (Constants.platform.android) {
-    if (Constants.isDevice) {
-      return 'android';
-    } else {
-      return 'android.simulator';
-    }
-  } else {
-    return 'unknown';
-  }
+  return (
+    Platform.select({
+      ios: Constants.isDevice ? 'ios' : 'ios.simulator',
+      android: Constants.isDevice ? 'android' : 'android.simulator',
+    }) || 'unknown'
+  );
 }
 
 export function firebaseUserObject(
@@ -46,14 +37,14 @@ export const CredentialsModel = CredentialsBase.volatile(() => ({
   firestoreUser: FirestoreUser.create(),
   pushNotifications: PushNotificationTokenModel.create({}),
 }))
-  .actions(self => {
+  .actions((self) => {
     return {
       afterCreate() {
         // sending initial credentials value to firestore, it has a diff gate that will not update it if the snapshot coming from the servers is the same:
         const snapshot = getSnapshot(self);
         const userSnapshot = firebaseUserObject(snapshot);
         self.firestoreUser.update(userSnapshot);
-        const update = flow(function*() {
+        const update = flow(function* () {
           log('queuing firestore snapshot update and async store update');
           yield Promise.all([
             persistCredentials(snapshot),
@@ -69,7 +60,7 @@ export const CredentialsModel = CredentialsBase.volatile(() => ({
             self,
             reaction(
               () => self.pushNotifications.fcmToken,
-              fcmToken => self.firestoreUser.update({fcmToken}),
+              (fcmToken) => self.firestoreUser.update({fcmToken}),
             ),
           );
         } else {
@@ -78,7 +69,7 @@ export const CredentialsModel = CredentialsBase.volatile(() => ({
       },
     };
   })
-  .views(self => ({
+  .views((self) => ({
     get requestBase(): RequestBase | null {
       if (self) {
         const {base_url, consumer_key, consumer_secret} = self;

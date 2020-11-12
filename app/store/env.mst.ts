@@ -1,5 +1,6 @@
-import { types, SnapshotIn, Instance } from "mobx-state-tree";
-import { ENV } from "../../environment";
+import {types, SnapshotIn, Instance} from 'mobx-state-tree';
+import {ENV} from '../../environment';
+import {Filter} from '../types';
 
 export const ExpoPackage = types.model({
   /**
@@ -7,27 +8,39 @@ export const ExpoPackage = types.model({
    * specified via the appStoreVersion parameter when calling the CLI's release command.
    */
   version: types.string,
-
 });
 
-export const EnvModel = types.model("Env", {
+export const CredentialsModel = types.model('EnvCredentials', {
+  base_url: types.string,
+  consumer_key: types.string,
+  consumer_secret: types.string,
+  phone_number: types.string,
+});
+
+export const EnvModel = types.model('Env', {
   expo: ExpoPackage,
-  credentials: types.model("EnvCredentials", {
-    base_url: types.string,
-    consumer_key: types.string,
-    consumer_secret: types.string,
-    phone_number: types.string,
-  }),
-  filter: types.enumeration(["last24Hours", "all"]),
+  credentials: CredentialsModel,
+  filter: Filter,
   pageSize: types.number,
 });
 
 export type EnvType = Instance<typeof EnvModel>;
+export type EnvSnapshot = SnapshotIn<typeof EnvModel>;
 
-export async function getEnv(): Promise<SnapshotIn<typeof EnvModel>> {
+export async function getEnv(): Promise<EnvSnapshot> {
   if (__DEV__) {
-    return ENV.dev;
+    return {
+      ...ENV.dev,
+      expo: {
+        version: 'dev',
+      },
+    };
   } else {
-    return ENV.staging
+    return {
+      ...ENV.staging,
+      expo: {
+        version: 'staging',
+      },
+    };
   }
 }

@@ -44,7 +44,8 @@ export const persistCredentials = async (payload: Credentials) => {
   }
 };
 
-let credentials: Credentials | null;
+let credentials: Credentials | null = null;
+
 export async function restoreCredentials(
   wipeFirst: boolean = false,
 ): Promise<Credentials | null> {
@@ -75,7 +76,7 @@ export async function restoreCredentials(
     logs.push('Failed restoring credentials from disk', error);
   } finally {
     log(`Restore credentials ${JSON.stringify(credentials)}`);
-    logs.forEach(item => log(` ${item}`));
+    logs.forEach((item) => log(` ${item}`));
     return credentials;
   }
 }

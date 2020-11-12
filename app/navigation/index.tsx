@@ -1,21 +1,21 @@
-import React from "react";
-import { View, Text } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import * as Screens from "../screens";
-import { DismissButton, SettingsButton } from "../components";
-import { colors } from "../styles";
+import React from 'react';
+import {View, Text} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import * as Screens from '../screens';
+import {DismissButton, SettingsButton} from '../components';
+import {colors} from '../styles';
 import {useCredentials} from '../provider';
 
 function HomeStack() {
-  const { Screen, Navigator } = createStackNavigator();
+  const {Screen, Navigator} = createStackNavigator();
   return (
     <Navigator>
       <Screen
         name="Home"
         component={Screens.HomeScreen}
         options={{
-          title: "Orders",
+          title: 'Orders',
           headerRight: () => <SettingsButton />,
           headerTintColor: colors.WHITE,
           headerBackTitle: undefined,
@@ -30,7 +30,7 @@ function HomeStack() {
 }
 
 function SettingsStack() {
-  const { Screen, Navigator } = createStackNavigator();
+  const {Screen, Navigator} = createStackNavigator();
   return (
     <Navigator>
       <Screen
@@ -63,16 +63,16 @@ function SettingsStack() {
 }
 
 function AppStack() {
-  const { Screen, Navigator } = createStackNavigator();
+  const {Screen, Navigator} = createStackNavigator();
   return (
     <Navigator mode="modal" screenOptions={{}}>
       <Screen
-        name={"Home"}
+        name={'Home'}
         component={HomeStack}
-        options={{ headerShown: false }}
+        options={{headerShown: false}}
       />
       <Screen
-        name={"Settings"}
+        name={'Settings'}
         component={SettingsStack}
         options={{
           headerShown: false,
@@ -83,22 +83,22 @@ function AppStack() {
 }
 
 export function Root() {
-  const { Navigator, Screen } = createStackNavigator();
+  const {Navigator, Screen} = createStackNavigator();
   const credentials = useCredentials();
   return (
     <NavigationContainer>
       <Navigator mode="modal">
         {credentials ? (
           <Screen
-            name={"Home"}
+            name={'Home'}
             component={AppStack}
-            options={{ headerShown: false }}
+            options={{headerShown: false}}
           />
         ) : (
           <Screen
-            name={"Settings"}
+            name={'Settings'}
             component={SettingsStack}
-            options={{ headerShown: false }}
+            options={{headerShown: false}}
           />
         )}
       </Navigator>

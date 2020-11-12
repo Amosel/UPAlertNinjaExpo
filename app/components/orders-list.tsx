@@ -11,7 +11,7 @@ import {observer} from 'mobx-react';
 import {useOrdersStore} from '../provider';
 import {filterValues} from '../types';
 
-function ClosedOrdersListSection({title}) {
+function ClosedOrdersListSection({title}: {title: string}) {
   return (
     <View style={{backgroundColor: colors.PRIMARYBGCOLOR}}>
       <Text
@@ -33,8 +33,9 @@ function OrderItemSeparator() {
   return <View style={styles.listSeparator} />;
 }
 export const ClosedOrdersList = observer(() => {
-  const store = useOrdersStore();
-  const {sections, refreshing, fetch} = store.closedOrdersView;
+  const {
+    closedOrdersView: {sections, refreshing, fetch},
+  } = useOrdersStore();
   const {navigate} = useNavigation();
   return (
     <SectionList

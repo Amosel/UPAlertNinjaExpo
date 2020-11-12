@@ -8,14 +8,16 @@ import {observer} from 'mobx-react';
 import {useOrdersStore} from '../provider';
 import {filterValues, FilterValue} from '../types';
 
-const getFilterText = (value: FilterValue) => {
-  switch (value) {
-    case filterValues.LAST24_HOURS: {
-      return 'Show from the 24 Hours';
+const getFilterText = (value: FilterValue): string => {
+  if (value === filterValues.LAST24_HOURS) {
+    return 'Show from the 24 Hours';
+  } else {
+    if (value !== filterValues.ALL) {
+      throw new Error(
+        `Expected either filterValues.LAST24_HOURS or filterValues.ALL got ${value}`,
+      );
     }
-    case filterValues.ALL: {
-      return 'Show all Orders';
-    }
+    return 'Show all Orders';
   }
 };
 
@@ -36,7 +38,7 @@ export const OrderFilterButton = observer(() => {
         title: 'Select Filter',
         options: [...values.map(getFilterText), 'Cancel'],
       },
-      index => {
+      (index) => {
         setFilter(values[index]);
       },
     );

@@ -17,7 +17,7 @@ export function useCredentialForm() {
   );
   const handleChange = React.useCallback(
     (entry: CredentialEntryName) => (input: string) => {
-      setState(state => ({
+      setState((state) => ({
         ...state,
         [entry]: input,
       }));

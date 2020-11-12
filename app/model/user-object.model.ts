@@ -13,10 +13,10 @@ const keys = [
 
 export function keysNeedingUpdate(current: Partial<UserObject>, next: {}) {
   if (!current) {
-    return !!Object.keys(next).filter(key => keys.includes(key));
+    return !!Object.keys(next).filter((key) => keys.includes(key));
   }
   return keys.filter(
-    key => next[key] && (!current[key] || next[key] !== current[key]),
+    (key) => next[key] && (!current[key] || next[key] !== current[key]),
   );
 }
 

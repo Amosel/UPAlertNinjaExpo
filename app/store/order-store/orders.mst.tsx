@@ -7,6 +7,7 @@ import {
   SnapshotOut,
 } from 'mobx-state-tree';
 import {reaction} from 'mobx';
+import {pick} from 'lodash';
 import {playSound, pauseSound} from '../../services/audio';
 import {
   Order,
@@ -39,16 +40,22 @@ import {getOrders, updateOrder} from '../../services/woo.commerce.endpoints';
 const log = console.log;
 // const log = (_message?: any, ..._optionalParams: any[]) => {};
 
-export const persistKeys = ['filter', 'seenOrderIds', 'notifications'];
+export const persistKeys: Array<string> = [
+  'filter',
+  'seenOrderIds',
+  'notifications',
+];
 
-function createRespnseObjFromOrders(orders: OrderSnap[]) {
+type OrdersResponseObject = {hash: string; orders: OrderSnap[]};
+
+function createRespnseObjFromOrders(
+  orders: OrderSnap[],
+): OrdersResponseObject | undefined {
   if (orders.length) {
     return {
-      hash: orders.map(order => order.id.toString()).join(''),
+      hash: orders.map((order) => order.id.toString()).join(''),
       orders,
     };
-  } else {
-    return null;
   }
 }
 
@@ -66,10 +73,7 @@ export const OrdersStore = types
     pollDelay: types.optional(types.number, 10000),
     itemsPerPage: types.optional(types.number, 100),
   })
-  .volatile(() => ({
-    lastResponseObj: null,
-  }))
-  .views(self => ({
+  .views((self) => ({
     get currentFilter(): (order: Order) => boolean {
       switch (self.filter) {
         case filterValues.LAST24_HOURS: {
@@ -79,7 +83,7 @@ export const OrdersStore = types
       return (_: Order) => true;
     },
   }))
-  .views(self => {
+  .views((self) => {
     return {
       isSeen(order: Order) {
         return isCompleted(order) || self.seenOrderIds.includes(order.id);
@@ -89,14 +93,14 @@ export const OrdersStore = types
       },
     };
   })
-  .actions(self => {
+  .actions((self) => {
     let _isFirstUpdate = true;
     return {
       updateOrders(orders: Order[]) {
         let newOrders: Order[] = [];
         let updatedOrderIds: number[] = [];
         const previousOrderIds = self.orders.map(({id}) => id);
-        orders.forEach(current => {
+        orders.forEach((current) => {
           const prev = self.orders.find(({id}) => current.id === id);
           if (!prev) {
             newOrders.push(current);
@@ -111,9 +115,9 @@ export const OrdersStore = types
             log(`Pushing First Time ${newOrders.length}`);
             self.orders.unshift(...newOrders);
           } else {
-            log(`Updaing orders ${newOrders.map(order => order.id)}`);
+            log(`Updaing orders ${newOrders.map((order) => order.id)}`);
             self.orders.unshift(
-              ...newOrders.map(order => {
+              ...newOrders.map((order) => {
                 if (!isCompleted(order)) {
                   return {
                     ...order,
@@ -179,7 +183,8 @@ export const OrdersStore = types
       },
     };
   })
-  .actions(self => {
+  .actions((self) => {
+    let lastResponseObj: undefined | OrdersResponseObject;
     let prevTime = 0;
     function handlePostUpdate({
       isFirstUpdate,
@@ -190,13 +195,13 @@ export const OrdersStore = types
     }) {
       if (
         !isFirstUpdate &&
-        newOrders.filter(order => !isCompleted(order)).length > 0
+        newOrders.filter((order) => !isCompleted(order)).length > 0
       ) {
         playSound();
       }
     }
 
-    const fetchOrders = flow(function*(silently: boolean = false) {
+    const fetchOrders = flow(function* (silently: boolean = false) {
       let logs: string[] = [];
       switch (self.state) {
         // point of exit if already updating:
@@ -225,15 +230,12 @@ export const OrdersStore = types
           {orderby: 'id', per_page: self.itemsPerPage, order: 'desc'},
           self.requestBase,
         );
-        const lastResponseObj = createRespnseObjFromOrders(orders);
-        if (
-          self.lastResponseObj &&
-          lastResponseObj.hash === self.lastResponseObj.hash
-        ) {
+        const _lastResponseObj = createRespnseObjFromOrders(orders);
+        if (_lastResponseObj?.hash === lastResponseObj?.hash) {
           logs.push('Done, no new orders, setting state to DONE');
         } else {
           logs.push('Done, setting orders and updaing state to DONE');
-          self.lastResponseObj = lastResponseObj;
+          lastResponseObj = _lastResponseObj;
           const update = self.updateOrders(orders);
           handlePostUpdate(update);
         }
@@ -256,7 +258,7 @@ export const OrdersStore = types
     });
     return {
       fetchOrders,
-      toggleOrderStatus: flow(function*(order: Order) {
+      toggleOrderStatus: flow(function* (order: Order) {
         let logs: string[] = [];
         if (self.updatingOrderIds.includes(order.id)) {
           return;
@@ -287,23 +289,25 @@ export const OrdersStore = types
           order.status = initialStatus;
         } finally {
           log(`Optimistically updaing Order ${order.id} to ${status}`);
-          logs.forEach(item => log(` ${item}`));
+          logs.forEach((item) => log(` ${item}`));
           self.updatingOrderIds.remove(order.id);
         }
       }),
     };
   })
-  .actions(self => {
-    let nextFetchOrdersCall;
-    const handleStateUpdate = flow(function*(
+  .actions((self) => {
+    let nextFetchOrdersCall: null | ReturnType<typeof setTimeout>;
+    const handleStateUpdate = flow(function* (
       state: Instance<typeof LoadingState>,
     ) {
       switch (state) {
         case loadingStateValues.ERROR:
         case loadingStateValues.DONE: {
-          if (!nextFetchOrdersCall) {
+          if (nextFetchOrdersCall === null) {
             nextFetchOrdersCall = setTimeout(() => {
-              clearTimeout(nextFetchOrdersCall);
+              clearTimeout(
+                nextFetchOrdersCall as ReturnType<typeof setTimeout>,
+              );
               nextFetchOrdersCall = null;
               self.fetchOrders(true);
             }, self.pollDelay);
@@ -328,7 +332,7 @@ export const OrdersStore = types
       },
     };
   })
-  .views(self => ({
+  .views((self) => ({
     get isRefresing(): boolean {
       switch (self.state) {
         case loadingStateValues.PENDING:
@@ -342,10 +346,10 @@ export const OrdersStore = types
     },
     get closedOrdersSections(): ClosedItemsSection[] {
       const sections: {key: string; title: string; data: Order[]}[] = [];
-      self.orders.forEach(order => {
+      self.orders.forEach((order) => {
         if (isCompleted(order)) {
           const key = timeFromNow(order);
-          const section = sections.find(s => s.key === key);
+          const section = sections.find((s) => s.key === key);
           if (section) {
             section.data.push(order);
           } else {
@@ -357,19 +361,19 @@ export const OrdersStore = types
     },
     get filteredOpenOrders() {
       return self.orders.filter(
-        order => isOpen(order) && self.currentFilter(order),
+        (order) => isOpen(order) && self.currentFilter(order),
       );
     },
     get invisibleOpenOrders() {
       return self.orders.filter(
-        order => isOpen(order) && !self.currentFilter(order),
+        (order) => isOpen(order) && !self.currentFilter(order),
       );
     },
     get ids() {
       return self.orders.map(getId);
     },
   }))
-  .views(self => ({
+  .views((self) => ({
     get openOrdersView(): OpenOrdersView {
       return {
         filter: self.filter,
@@ -392,50 +396,59 @@ export const OrdersStore = types
 export type IOrdersStore = Instance<typeof OrdersStore>;
 export type StoreInSnapshot = SnapshotIn<typeof OrdersStore>;
 export type StoreOutSnapshot = SnapshotOut<typeof OrdersStore>;
-export const initialSnapsot: StoreInSnapshot = {
-  state: 'IDLE',
+
+export const initialSnapsot: Partial<StoreInSnapshot> = {
+  state: loadingStateValues.IDLE,
   orders: [],
   seenOrderIds: [],
   filter: filterValues.LAST24_HOURS,
 };
 
-export function dataToPersist(store: StoreOutSnapshot) {
-  const empty = {};
-  const update = persistKeys.reduce((sum, key) => {
-    const value = store[key];
-    if (value) {
-      sum[key] = value;
-    }
-    return sum;
-  }, empty);
-  return JSON.stringify(update);
+export function hasDataToPersist(store: IOrdersStore | Object): boolean {
+  return Object.keys(pick(store, persistKeys)).length != 0;
 }
 
-export function restoreFromPersistnce(data: {}): [StoreInSnapshot, string[]] {
-  let snapshot = initialSnapsot;
-  const logs: string[] = [];
-  let restoredItems = [];
-  persistKeys.forEach(key => {
-    if (data[key]) {
-      if (!OrdersStore.properties[key]) {
-        logs.push(`Current store has no key: ${key}`);
-        return;
-      }
-      const value = data[key];
-      if (!OrdersStore.properties[key].is(value)) {
-        logs.push(`Current store does not accecpts ${value} for key: ${key}`);
-        return;
-      }
-      restoredItems.push(key);
+export function dataToPersist(store: IOrdersStore) {
+  return JSON.stringify(pick(store, persistKeys) || {});
+}
+
+// export function restoreFromPersistnce(data: {}): [StoreInSnapshot, string[]] {
+//   const snapshot = initialSnapsot;
+//   const logs: string[] = [];
+//   let restoredItems = Array<string>();
+//   persistKeys.forEach((key) => {
+//     if (key in data) {
+//       if (key in OrdersStore.properties == false) {
+//         logs.push(`Store has no key: ${key}`);
+//         return;
+//       }
+//       const value = data[key];
+//       if (!OrdersStore.properties[key].is(value)) {
+//         logs.push(`Store does not accecpts ${value} for key: ${key}`);
+//         return;
+//       }
+//       restoredItems.push(key);
+//       snapshot[key] = data[key];
+//     }
+//   });
+//   if (restoredItems.length === 0) {
+//     logs.push('No items found in storage');
+//   } else {
+//     logs.push(`Restored from storage keys: ${restoredItems.join(',')}`);
+//   }
+
+//   snapshot.state = loadingStateValues.IDLE;
+//   return [snapshot, logs];
+// }
+
+export function restoreFromPersistence(data: {}): Partial<StoreInSnapshot> {
+  const snapshot = initialSnapsot;
+  persistKeys.forEach((key) => {
+    if (key in data) {
       snapshot[key] = data[key];
     }
   });
-  if (restoredItems.length === 0) {
-    logs.push('No items found in storage');
-  } else {
-    logs.push(`Restored from storage keys: ${restoredItems.join(',')}`);
-  }
-
   snapshot.state = loadingStateValues.IDLE;
-  return [snapshot, logs];
+
+  return snapshot;
 }

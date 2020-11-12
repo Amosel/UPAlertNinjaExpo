@@ -13,7 +13,7 @@ import {
 function TouchableLink({
   href,
   title,
-  onError = e => Alert.alert('Ouups...', e.message),
+  onError = (e) => Alert.alert('Ouups...', e.message),
 }: {
   href: string;
   title: string;

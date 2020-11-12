@@ -1,9 +1,23 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Root } from './app/navigation'
-export default function App() {
+import React from "react";
+import { StatusBar } from "react-native";
+import { Root } from "./app/navigation";
+import { AppProvider } from "./app/provider";
+import { checkForAudio } from "./app/services/audio";
+import { useKeepAwake } from "expo-keep-awake";
+
+const App = () => {
+  useKeepAwake();
+  React.useEffect(() => {
+    checkForAudio();
+  }, []);
+  React.useEffect(() => {
+    StatusBar.setBarStyle("light-content");
+  }, []);
   return (
-    <Root />
-  );
-}
+    <AppProvider>
+      <Root />
+    </AppProvider>
+  );  
+};
+
+export default App;

@@ -19,9 +19,9 @@ import {
   OrdersStore,
   restoreOrderStore,
   initialSnapsot,
-  dataToPersist,
+  hasDataToPersist,
 } from './order-store';
-import {getEnv, Env} from './env.mst';
+import {getEnv, EnvModel} from './env.mst';
 import {reaction} from 'mobx';
 
 const log = console.log;
@@ -31,19 +31,24 @@ export const App = types
   .model('OrdersStore', {
     credentials: types.maybeNull(CredentialsModel),
     orders: types.maybeNull(OrdersStore),
-    env: Env,
+    env: EnvModel,
   })
-  .actions(self => {
+  .actions((self) => {
     let appState: AppStateStatus = AppState.currentState;
     function handleOrdersChange() {
       if (self.orders) {
         addDisposer(
           self,
           reaction(
-            () => dataToPersist(getSnapshot(self.orders)),
-            update => {
-              log('Persisting Order Store');
-              persistStorage(self.credentials, update);
+            () => hasDataToPersist(self.orders || {}),
+            () => {
+              if (self.credentials != null) {
+                log('Persisting Order Store');
+                persistStorage(
+                  self.credentials,
+                  JSON.stringify(getSnapshot(self.orders!)),
+                );
+              }
             },
           ),
         );
@@ -94,7 +99,7 @@ export const App = types
       beforeDestroy() {
         AppState.removeEventListener('change', handleAppStateChange);
       },
-      setCredentials: flow(function*(input: Credentials) {
+      setCredentials: flow(function* (input: Credentials) {
         if (
           self.credentials === null ||
           !isEqual(getSnapshot(self.credentials), input)
@@ -115,7 +120,7 @@ export const App = types
 
 type AppSnapshot = SnapshotIn<typeof App>;
 
-export async function RestoreApp() {
+export async function restoreApp() {
   log('Restoring app');
   const [credentials, env] = await Promise.all([
     restoreCredentials(),
@@ -126,7 +131,7 @@ export async function RestoreApp() {
     orders: null,
     env,
   };
-  if (credentials) {
+  if (credentials !== null) {
     const {base_url, consumer_key, consumer_secret} = credentials;
     const requestBase = {base_url, consumer_key, consumer_secret};
     const restoredOrdersStore = await restoreOrderStore(credentials);

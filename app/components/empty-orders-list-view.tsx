@@ -33,7 +33,13 @@ function EmptyOrderListView({
   );
 }
 
-export function NoCredentialsComonent({text, openSettingsText}) {
+export function NoCredentialsComonent({
+  text,
+  openSettingsText,
+}: {
+  text: string;
+  openSettingsText: string;
+}) {
   const {navigate} = useNavigation();
   return (
     <EmptyOrderListView
@@ -48,8 +54,7 @@ export function NoCredentialsComonent({text, openSettingsText}) {
 
 export const OrderListEmptyComponent = observer(
   ({loadingMessage = 'Loading...', emptyMessage = 'No Orders found'}) => {
-    const store = useOrdersStore();
-    const {isRefresing, error, fetchOrders} = store;
+    const {isRefresing, error, fetchOrders} = useOrdersStore();
     if (isRefresing) {
       return (
         <EmptyOrderListView

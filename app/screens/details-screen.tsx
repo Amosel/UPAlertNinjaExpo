@@ -53,7 +53,7 @@ export const DetailsScreen = observer(() => {
             renderItem={({item, index}) => (
               <LineItemView lineItem={item} index={index} />
             )}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={(item) => item.id.toString()}
           />
           <OrderDetailsFooterView order={order} />
         </View>

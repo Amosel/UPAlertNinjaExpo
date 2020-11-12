@@ -1,11 +1,6 @@
 import axios from 'axios';
-import {OrderSnap} from '../types/order.types';
-import {
-  OrderStatus,
-  WebHook,
-  RequestBase,
-  GetOrdersParams,
-} from '../types/woo.commerce.api.types';
+import {OrderSnap} from '../types';
+import {OrderStatus, WebHook, RequestBase, GetOrdersParams} from '../types';
 
 // const log = console.log
 const log = (_message?: any, ..._optionalParams: any[]) => {};
@@ -50,7 +45,7 @@ export const getOrders = (
   }
   return get<{}[]>(
     `${base_url}/orders/?consumer_key=${consumer_key}&consumer_secret=${consumer_secret}${queryEnd}`,
-  ).then(response => response.data as OrderSnap[]);
+  ).then((response) => response.data as OrderSnap[]);
 };
 
 export const updateOrder = (

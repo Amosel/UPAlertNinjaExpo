@@ -1,5 +1,51 @@
-import messaging from '@react-native-firebase/messaging';
-import {Platform, NativeModules} from 'react-native';
+import firebase from 'firebase';
+import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
+import {Platform} from 'react-native';
+
+const messaging = firebase.messaging;
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+export async function registerForPushNotificationsAsync(): Promise<
+  [Notifications.DevicePushToken, Notifications.ExpoPushToken] | false
+> {
+  if (Constants.isDevice) {
+    log('Getting Permission for Notification');
+    let response = await Notifications.getPermissionsAsync();
+
+    if (response.granted === false && response.canAskAgain === true) {
+      response = await Notifications.requestPermissionsAsync({
+        ios: {
+          allowAlert: true,
+          allowBadge: true,
+          allowSound: true,
+          allowAnnouncements: true,
+        },
+      });
+      if (!response.granted) {
+        // eslint-disable-next-line no-alert
+        alert('Failed to get push token for push notification!');
+        return false;
+      }
+      return await Promise.all([
+        Notifications.getDevicePushTokenAsync(),
+        Notifications.getExpoPushTokenAsync(),
+      ]);
+    } else {
+      return false;
+    }
+  } else {
+    log('Not Getting Token, we are in simulator');
+    return false;
+  }
+}
 
 import {types, Instance, flow, addDisposer} from 'mobx-state-tree';
 const log = console.log;
@@ -19,10 +65,29 @@ const permissionStateValues = {
   UNDETERMINED: 'Undetermined',
 };
 
+export const NativeTokenModel = types.model('token', {
+  type: types.union(types.literal('ios'), types.literal('android')),
+  data: types.union(
+    types.string,
+    types.model({
+      endpoint: types.string,
+      keys: types.model({
+        p256dh: types.string,
+        auth: types.string,
+      }),
+    }),
+  ),
+});
+
+export const ExpoPushTokenModel = types.model('expo-token', {
+  type: types.literal('expo'),
+  data: types.string,
+});
+
 export const PushNotificationTokenModel = types
   .model('Token', {
-    fcmToken: types.maybeNull(types.string),
-    apnToken: types.maybeNull(types.string),
+    expoToken: types.maybeNull(ExpoPushTokenModel),
+    apnToken: types.maybeNull(NativeTokenModel),
   })
   .volatile(() => ({
     state: stateValues.INITIALIZING,
@@ -30,37 +95,14 @@ export const PushNotificationTokenModel = types
     getTokenInTheFuture: false,
     requestPermissionInTheFuture: false,
   }))
-  .views(self => ({
-    get canGetToken() {
-      return (
-        self.state === stateValues.IDLE &&
-        self.permission === permissionStateValues.GRANDTED
-      );
-    },
-    get canRequestPermission() {
-      return self.state === stateValues.IDLE;
-    },
-    get continueToRequestPermission() {
-      return (
-        self.permission === permissionStateValues.GRANDTED &&
-        (self.requestPermissionInTheFuture || self.getTokenInTheFuture)
-      );
-    },
-    get continueToGetToken() {
-      return (
-        self.permission === permissionStateValues.GRANDTED &&
-        self.getTokenInTheFuture
-      );
-    },
-  }))
-  .actions(self => {
+  .actions((self) => {
     let listener = () => {};
     let outerCallback = () => {};
     let logs: string[] = [];
 
     function flush(title: string) {
       log(title);
-      logs.forEach(item => log(` ${item}`));
+      logs.forEach((item) => log(` ${item}`));
       logs = [];
     }
 
@@ -69,52 +111,66 @@ export const PushNotificationTokenModel = types
         return;
       }
       logs.push('Subscribe to token updates');
+      messaging()
+        .getToken()
+        .then((token) => {
+          self.expoToken = {type: 'expo', data: token};
+        });
+
       type Unsubscribe = () => void;
       let items: Unsubscribe[] = [];
-      items.push(
-        messaging().onTokenRefresh(token => {
-          log(`Token updated to ${token}`);
-          self.fcmToken = token;
-        }),
-      );
+      // items.push(
+      //   messaging().onTokenRefresh((token) => {
+      //     log(`Token updated to ${token}`);
+      //     self.fcmToken = token;
+      //   }),
+      // );
       logs.push('Setting up Notifications listener');
+      // items.push(
+      // messaging().onMessage((messageId) => {
+      // messaging().onMessageSent((messageId) => {
+      //   log('Receied message id', messageId);
+      //   if (outerCallback) {
+      //     outerCallback();
+      //   }
+      // }),
+      // );
       items.push(
-        messaging().onMessageSent(messageId => {
-          log('Receied message id', messageId);
-          if (outerCallback) {
-            outerCallback();
-          }
-        }),
-      );
-      items.push(
-        messaging().onMessage(message => {
+        messaging().onMessage((message) => {
           log('Receied message', message);
           if (outerCallback) {
             outerCallback();
           }
         }),
       );
+      items.push(
+        messaging().onBackgroundMessage((message) => {
+          log('Receied message in background', message);
+          if (outerCallback) {
+            outerCallback();
+          }
+        }),
+      );
       flush('Subscribed');
-      listener = () => items.forEach(item => item());
+      listener = () => items.forEach((item) => item());
     }
 
-    const getToken = flow(function*() {
-      if (self.canGetToken) {
-        logs.push('Getting Token');
-        self.state = stateValues.GETTING_TOKEN;
+    const getToken = flow(function* () {
+      self.state = stateValues.GETTING_TOKEN;
+      const result:
+        | [Notifications.DevicePushToken, Notifications.ExpoPushToken]
+        | false = yield registerForPushNotificationsAsync();
+      if (result !== false) {
         try {
-          const fcmToken = yield Platform.OS === 'ios'
-            ? NativeModules.Workaround.getToken()
-            : messaging().getToken();
+          const [apnToken, expoToken] = result;
           // const fcmToken = yield messaging().getToken();
-          self.fcmToken = fcmToken;
-          logs.push(`Got token:${self.fcmToken.substring(0, 10)}...`);
+          self.expoToken = expoToken;
+          logs.push(`Got token:${expoToken.data.substring(0, 10)}...`);
           if (Platform.OS === 'ios') {
-            const apnToken = yield messaging().getAPNSToken();
             logs.push(apnToken ? `apn: ${apnToken}` : 'no apn token');
           }
         } catch (error) {
-          self.fcmToken = null;
+          self.expoToken = null;
           logs.push('Failed gettings token', error);
         }
         subscribe();
@@ -125,59 +181,11 @@ export const PushNotificationTokenModel = types
       flush('Get token');
     });
 
-    const requestPermission = flow(function*() {
-      if (self.canRequestPermission) {
-        logs.push('Requesting for Permission');
-        self.state = 'RequestingPermission';
-        try {
-          const permission = yield messaging().requestPermission();
-          self.permission = permission
-            ? permissionStateValues.GRANDTED
-            : permissionStateValues.REFUSED;
-        } catch {
-          self.permission = permissionStateValues.FAILED;
-        }
-        self.state = stateValues.IDLE;
-
-        logs.push(`Permission is ${self.permission}`);
-
-        if (self.continueToGetToken) {
-          log('Continuing getting Token');
-          self.getTokenInTheFuture = false;
-          getToken();
-        } else {
-          flush('Request permission');
-        }
-      } else if (self.state === stateValues.INITIALIZING) {
-        log('Initializing, will Request Permission when Idle');
-        self.requestPermissionInTheFuture = true;
-      }
-    });
-    const updatePermission = flow(function*() {
-      logs.push('Checking for permission');
-      try {
-        const hasPermission = yield messaging().hasPermission();
-        self.permission = hasPermission
-          ? permissionStateValues.GRANDTED
-          : permissionStateValues.REFUSED;
-      } catch {}
-      self.state = stateValues.IDLE;
-      logs.push(`Permission is ${self.permission}`);
-
-      if (self.continueToRequestPermission) {
-        log('Continuing with requesting permission');
-        self.requestPermissionInTheFuture = false;
-        requestPermission();
-      } else {
-        flush('Update permission');
-      }
-    });
-
     return {
       afterCreate() {
         self.state = stateValues.INITIALIZING;
         self.permission = permissionStateValues.UNDETERMINED;
-        updatePermission();
+        getToken();
         addDisposer(self, () => {
           if (listener) {
             listener();
@@ -185,8 +193,6 @@ export const PushNotificationTokenModel = types
         });
       },
       getToken,
-      requestPermission,
-      updatePermission,
       onMessage(callback: () => void) {
         outerCallback = callback;
       },

@@ -1,11 +1,11 @@
 import React from 'react';
 import {View, Alert} from 'react-native';
 import {ActionSheetProvider} from '@expo/react-native-action-sheet';
-import {RestoreApp, IApp} from './store';
+import {restoreApp, IApp} from './store';
 
 const AppContext = React.createContext<IApp | null>(null);
 
-export function useStore(): IApp | null {
+export function useStore(): IApp {
   const store = React.useContext(AppContext);
   if (!store) {
     // this is especially useful in TypeScript so you don't need to be checking for null all the time
@@ -15,7 +15,7 @@ export function useStore(): IApp | null {
 }
 
 export function useOrdersStore() {
-  return useStore().orders;
+  return useStore().orders!;
 }
 
 export function useCredentials() {
@@ -30,13 +30,13 @@ export type InitializationState =
   | {done: false}
   | {done: true; result: InitializationResult};
 
-export function AppProvider({children}) {
+export function AppProvider({children}: {children: React.ReactNode}) {
   const [state, setState] = React.useState<InitializationState>({
     done: false,
   });
   async function restore() {
     try {
-      const app = await RestoreApp();
+      const app = await restoreApp();
       setState({done: true, result: {success: true, app}});
     } catch (error) {
       setState({

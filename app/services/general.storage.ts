@@ -45,7 +45,7 @@ export async function restoreStorage<T extends {}>(
     data = [];
   } finally {
     log('RestoreStorage:');
-    logs.forEach(item => log(` ${item}`));
+    logs.forEach((item) => log(` ${item}`));
     return data;
   }
 }
@@ -66,7 +66,7 @@ export async function persistStorage<T extends {}>(
       logs.push('Failed persiting store', error);
     } finally {
       log('PersistStore:');
-      logs.forEach(item => log(` ${item}`));
+      logs.forEach((item) => log(` ${item}`));
     }
   }
 }
@@ -81,6 +81,6 @@ export async function wipeStorage(credentials: Credentials) {
     logs.push('Failed persiting store', error);
   } finally {
     log('wipeOrderIds:');
-    logs.forEach(item => log(` ${item}`));
+    logs.forEach((item) => log(` ${item}`));
   }
 }

@@ -1,5 +1,6 @@
 import {
-  restoreFromPersistnce,
+  // restoreFromPersistnce,
+  restoreFromPersistence,
   StoreInSnapshot,
   initialSnapsot,
 } from './orders.mst';
@@ -19,14 +20,14 @@ export async function restoreOrderStore(
     const data = await restoreStorage(credentials, wipe);
     // never throws
     if (data) {
-      [snapshot, logs] = restoreFromPersistnce(data);
+      snapshot = restoreFromPersistence(data);
     }
     logs.push(`Restoreed snapshot: ${JSON.stringify(snapshot, null, 2)}`);
   } catch (error) {
     logs.push(`Failed restoring snapshot data, ${error}`);
   } finally {
     log('Initialize store snapshot:');
-    logs.forEach(item => log(` ${item}`));
+    logs.forEach((item) => log(` ${item}`));
     return snapshot;
   }
 }
