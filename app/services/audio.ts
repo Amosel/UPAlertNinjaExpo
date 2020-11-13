@@ -14,12 +14,12 @@ let alertSound: Audio.Sound | null = null;
 let status: AVPlaybackStatus | null = null;
 
 export async function playSound() {
-  if (alertSound == null) {
+  if (alertSound === null) {
     alertSound = new Audio.Sound();
   }
 
   try {
-    if (status == null || status.isLoaded == false) {
+    if (status === null || status.isLoaded === false) {
       status = await alertSound.loadAsync(
         Platform.select({
           ios: require('../assets/alert.caf'),
@@ -29,9 +29,9 @@ export async function playSound() {
     }
 
     if (
-      status != null &&
-      status.isLoaded == true &&
-      status.isPlaying == false
+      status !== null &&
+      status.isLoaded === true &&
+      status.isPlaying === false
     ) {
       status = await alertSound.playAsync();
       // Your sound is playing!
@@ -51,10 +51,10 @@ export async function playSound() {
 
 export async function pauseSound() {
   if (
-    alertSound != null &&
+    alertSound !== null &&
     status &&
-    status.isLoaded == true &&
-    status.isPlaying == true
+    status.isLoaded === true &&
+    status.isPlaying === true
   ) {
     status = await alertSound.pauseAsync();
   }
