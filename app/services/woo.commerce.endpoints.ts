@@ -2,8 +2,8 @@ import axios from 'axios';
 import {OrderSnap} from '../types';
 import {OrderStatus, WebHook, RequestBase, GetOrdersParams} from '../types';
 
-// const log = console.log
-const log = (_message?: any, ..._optionalParams: any[]) => {};
+const log = console.log;
+// const log = (_message?: any, ..._optionalParams: any[]) => {};
 
 const get = <T>(url: string) => {
   log(`GET: ${url}`);
@@ -43,9 +43,8 @@ export const getOrders = (
   if (rest.before) {
     queryEnd += `&before=${rest.before.toISOString()}`;
   }
-  return get<{}[]>(
-    `${base_url}/orders/?consumer_key=${consumer_key}&consumer_secret=${consumer_secret}${queryEnd}`,
-  ).then((response) => response.data as OrderSnap[]);
+  let url = `${base_url}/orders/?consumer_key=${consumer_key}&consumer_secret=${consumer_secret}${queryEnd}`;
+  return get<{}[]>(url).then((response) => response.data as OrderSnap[]);
 };
 
 export const updateOrder = (
