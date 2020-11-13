@@ -25,6 +25,18 @@ function HomeStack() {
           },
         }}
       />
+      <Screen
+        name="Details"
+        component={Screens.DetailsScreen}
+        options={{
+          headerTintColor: colors.WHITE,
+          headerBackTitle: undefined,
+          headerStyle: {
+            backgroundColor: colors.PRIMARYBGCOLOR,
+            borderBottomWidth: 0,
+          },
+        }}
+      />
     </Navigator>
   );
 }
@@ -90,7 +102,7 @@ export const Root = observer(() => {
       <Navigator mode="modal">
         {credentials ? (
           <Screen
-            name={'Home'}
+            name={'HomeStack'}
             component={AppStack}
             options={{headerShown: false}}
           />
