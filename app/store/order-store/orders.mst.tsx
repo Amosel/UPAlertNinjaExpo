@@ -88,7 +88,7 @@ export const OrdersStore = types
       isSeen(order: Order) {
         return isCompleted(order) || self.seenOrderIds.includes(order.id);
       },
-      getOrder(orderNumber: number) {
+      getOrder(orderNumber: number): Order | undefined {
         return self.orders.find(({id}) => id === orderNumber);
       },
     };
@@ -405,7 +405,7 @@ export const initialSnapsot: Partial<StoreInSnapshot> = {
 };
 
 export function hasDataToPersist(store: IOrdersStore | Object): boolean {
-  return Object.keys(pick(store, persistKeys)).length != 0;
+  return Object.keys(pick(store, persistKeys)).length !== 0;
 }
 
 export function dataToPersist(store: IOrdersStore) {

@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {SafeAreaView, Text, View, FlatList, Image} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {Button} from 'react-native-elements';
 import styles, {colors} from '../styles';
 import {useOrdersStore} from '../provider';
@@ -12,6 +12,7 @@ import {
   OrderDetailsHeaderView,
   OrderDetailsFooterView,
 } from '../components';
+import {DetailsScreenRouteProp} from '../navigation/navigation.types';
 import {isCompleted} from '../model';
 
 function DetailsScreenHeader() {
@@ -27,15 +28,15 @@ function DetailsScreenHeader() {
 }
 
 export const DetailsScreen = observer(() => {
-  const {goBack, getParam} = useNavigation();
-  const orderNumber = getParam('orderNumber') as number;
+  const {goBack} = useNavigation();
+  const {orderNumber} = useRoute<DetailsScreenRouteProp>().params;
   const {
     setSeen,
     getOrder,
     toggleOrderStatus,
     updatingOrderIds,
   } = useOrdersStore();
-  const order = getOrder(orderNumber);
+  const order = getOrder(orderNumber)!;
   const isComplete = isCompleted(order);
 
   React.useEffect(() => {
