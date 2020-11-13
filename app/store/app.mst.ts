@@ -123,7 +123,7 @@ type AppSnapshot = SnapshotIn<typeof App>;
 export async function restoreApp() {
   log('Restoring app');
   const [credentials, env] = await Promise.all([
-    restoreCredentials(true),
+    restoreCredentials(/* true will force wiping the credentials that were saved from last session */),
     getEnv(),
   ]);
   let snapshot: AppSnapshot = {
