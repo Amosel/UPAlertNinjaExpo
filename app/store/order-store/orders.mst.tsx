@@ -223,11 +223,15 @@ export const OrdersStore = types
           break;
         }
       }
-      logs.push(`Calling Update API ${silently ? 'silently' : ''}`);
+      const per_page = self.itemsPerPage;
+      const orderby = 'id';
+      const order = 'desc';
+
       self.willUpdate(silently);
+      
       try {
         const orders = yield getOrders(
-          {orderby: 'id', per_page: self.itemsPerPage, order: 'desc'},
+          {orderby, per_page, order},
           self.requestBase,
         );
         const _lastResponseObj = createRespnseObjFromOrders(orders);
