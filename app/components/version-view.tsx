@@ -2,7 +2,6 @@ import React from 'react';
 import {Text} from 'react-native';
 import styles, {colors} from '../styles';
 import {useStore} from '../provider';
-import {EnvType} from '../store/env.mst';
 
 export function VersionView() {
   const store = useStore();

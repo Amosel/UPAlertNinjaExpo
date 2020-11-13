@@ -119,22 +119,7 @@ export const PushNotificationTokenModel = types
 
       type Unsubscribe = () => void;
       let items: Unsubscribe[] = [];
-      // items.push(
-      //   messaging().onTokenRefresh((token) => {
-      //     log(`Token updated to ${token}`);
-      //     self.fcmToken = token;
-      //   }),
-      // );
       logs.push('Setting up Notifications listener');
-      // items.push(
-      // messaging().onMessage((messageId) => {
-      // messaging().onMessageSent((messageId) => {
-      //   log('Receied message id', messageId);
-      //   if (outerCallback) {
-      //     outerCallback();
-      //   }
-      // }),
-      // );
       items.push(
         messaging().onMessage((message) => {
           log('Receied message', message);
@@ -163,7 +148,6 @@ export const PushNotificationTokenModel = types
       if (result !== false) {
         try {
           const [apnToken, expoToken] = result;
-          // const fcmToken = yield messaging().getToken();
           self.expoToken = expoToken;
           logs.push(`Got token:${expoToken.data.substring(0, 10)}...`);
           if (Platform.OS === 'ios') {

@@ -59,8 +59,8 @@ export const CredentialsModel = CredentialsBase.volatile(() => ({
           addDisposer(
             self,
             reaction(
-              () => self.pushNotifications.fcmToken,
-              (fcmToken) => self.firestoreUser.update({fcmToken}),
+              () => self.pushNotifications.expoToken,
+              (expoToken) => self.firestoreUser.update({expoToken}),
             ),
           );
         } else {
@@ -74,6 +74,8 @@ export const CredentialsModel = CredentialsBase.volatile(() => ({
       if (self) {
         const {base_url, consumer_key, consumer_secret} = self;
         return {base_url, consumer_key, consumer_secret};
+      } else {
+        return null;
       }
     },
   }));

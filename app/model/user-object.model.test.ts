@@ -1,6 +1,6 @@
 import {keysNeedingUpdate} from './user-object.model';
 
-const fcmToken = '11111';
+const expoToken = '11111';
 
 describe('keysNeedingUpdate', () => {
   test('whith new field that is not there', () => {
@@ -14,9 +14,9 @@ describe('keysNeedingUpdate', () => {
           phone_number: '929.309.5026',
           plaform: 'ios',
         },
-        {fcmToken},
+        {expoToken},
       ),
-    ).toEqual(['fcmToken']);
+    ).toEqual(['expoToken']);
   });
   test('whith new field that is different', () => {
     expect(
@@ -28,11 +28,11 @@ describe('keysNeedingUpdate', () => {
           host: 'pho-palace.upco.co',
           phone_number: '929.309.5026',
           plaform: 'ios',
-          fcmToken: '11',
+          expoToken: '11',
         },
-        {fcmToken},
+        {expoToken},
       ),
-    ).toEqual(['fcmToken']);
+    ).toEqual(['expoToken']);
   });
   test('whith new field that is same', () => {
     expect(
@@ -44,9 +44,9 @@ describe('keysNeedingUpdate', () => {
           host: 'pho-palace.upco.co',
           phone_number: '929.309.5026',
           plaform: 'ios',
-          fcmToken,
+          expoToken,
         },
-        {fcmToken},
+        {expoToken},
       ),
     ).toEqual([]);
   });

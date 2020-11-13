@@ -286,7 +286,7 @@ export type PlatformName =
 export type UserObject = Credentials & {
   host: string;
   plaform: PlatformName;
-  fcmToken?: string;
+  expoToken?: string;
   apnToken?: string;
 };
 

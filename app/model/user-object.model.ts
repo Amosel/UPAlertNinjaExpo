@@ -7,7 +7,7 @@ const keys = [
   'phone_number',
   'host',
   'plaform',
-  'fcmToken',
+  'expoToken',
   'apnToken',
 ];
 
