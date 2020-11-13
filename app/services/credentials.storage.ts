@@ -49,34 +49,34 @@ let credentials: Credentials | null = null;
 export async function restoreCredentials(
   wipeFirst: boolean = false,
 ): Promise<Credentials | null> {
-  const logs: string[] = [];
   if (credentials) {
     return credentials;
   }
   try {
     if (wipeFirst) {
-      logs.push('Wiping credentials from previous session');
+      log('Wiping credentials from previous session');
       await wipeCredentials();
     }
     const data = await service.get(CREDENTIALS);
 
     if (data) {
-      logs.push('Restored credentials data from previous session');
+      log('Restored credentials data from previous session');
       if (CredentialsHelper.isValidCredentials(JSON.parse(data))) {
         credentials = JSON.parse(data);
       } else {
-        logs.push(
-          `Restored credentials that are invalid, ${data} returning null`,
-        );
+        log(`Restored credentials that are invalid, ${data} returning null`);
       }
     } else {
-      logs.push('No credentials found on disk');
+      log('No credentials found on disk');
     }
   } catch (error) {
-    logs.push('Failed restoring credentials from disk', error);
+    log('Failed restoring credentials from disk', error);
   } finally {
-    log(`Restore credentials ${JSON.stringify(credentials)}`);
-    logs.forEach((item) => log(` ${item}`));
+    log(
+      credentials
+        ? `Restored credentials are ${JSON.stringify(credentials)}`
+        : 'No Credentials restored',
+    );
     return credentials;
   }
 }
