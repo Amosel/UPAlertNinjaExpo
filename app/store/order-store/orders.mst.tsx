@@ -36,7 +36,7 @@ import {
   isCompleted,
 } from '../../model';
 import {getOrders, updateOrder} from '../../services/woo.commerce.endpoints';
-
+import { POLL_DELAY } from '../../constants'
 const log = console.log;
 // const log = (_message?: any, ..._optionalParams: any[]) => {};
 
@@ -70,7 +70,7 @@ export const OrdersStore = types
     lastUpdateDate: types.maybeNull(types.Date),
     notifications: NotificationsArray,
     filter: Filter,
-    pollDelay: types.optional(types.number, 10000),
+    pollDelay: types.optional(types.number, POLL_DELAY),
     itemsPerPage: types.optional(types.number, 100),
   })
   .views((self) => ({
@@ -228,7 +228,7 @@ export const OrdersStore = types
       const order = 'desc';
 
       self.willUpdate(silently);
-      
+
       try {
         const orders = yield getOrders(
           {orderby, per_page, order},
@@ -300,7 +300,7 @@ export const OrdersStore = types
     };
   })
   .actions((self) => {
-    let nextFetchOrdersCall: null | ReturnType<typeof setTimeout>;
+    let nextFetchOrdersCall: null | ReturnType<typeof setTimeout> = null;
     const handleStateUpdate = flow(function* (
       state: Instance<typeof LoadingState>,
     ) {
@@ -315,7 +315,7 @@ export const OrdersStore = types
               nextFetchOrdersCall = null;
               self.fetchOrders(true);
             }, self.pollDelay);
-            // log(`Scheduling silent get orders in ${self.pollDelay} ms`);
+            log(`Scheduling silent get orders in ${self.pollDelay} ms`);
           }
           break;
         }
