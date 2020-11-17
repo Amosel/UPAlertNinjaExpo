@@ -50,12 +50,11 @@ function SettingsStack() {
         component={Screens.SettingsScreen}
         options={{
           headerRight: () => <DismissButton />,
+          headerLeft: () => null,
           headerTintColor: colors.WHITE,
-          headerBackTitle: undefined,
           headerStyle: {
             backgroundColor: colors.PRIMARYBGCOLOR,
           },
-          headerLeft: undefined,
         }}
       />
       <Screen
