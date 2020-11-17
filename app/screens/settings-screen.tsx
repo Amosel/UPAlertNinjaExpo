@@ -14,7 +14,7 @@ import {useCredentialForm} from '../hooks';
 export const SettingsScreen = observer(() => {
   const keyboardIsShowing = useKeyboard();
   const {userInput, handleChange, canSave, onPress} = useCredentialForm();
-  const {navigate} = useNavigation();
+  const {navigate, canGoBack, goBack} = useNavigation();
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.PRIMARYBGCOLOR}}>
       <View style={styles.container}>
@@ -40,7 +40,12 @@ export const SettingsScreen = observer(() => {
             }}
             title="SAVE SETTINGS"
             type="solid"
-            onPress={onPress}
+            onPress={() => {
+              if (canGoBack()) {
+                goBack();
+              }
+              onPress();
+            }}
           />
         </KeyboardAvoidingScrollView>
       </View>
