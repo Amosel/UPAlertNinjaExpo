@@ -6,7 +6,23 @@
 // ignore expo implememtation:
 // import Constants from 'expo-constants';
 
-export const ENV = {
+export interface SelectedEnvironmentData {
+  credentials: {
+    base_url: string;
+    consumer_key: string;
+    consumer_secret: string;
+    phone_number: string;
+  };
+  filter: string;
+  pageSize: number;
+}
+export interface EnvironmentPayload {
+  dev: SelectedEnvironmentData;
+  staging: SelectedEnvironmentData;
+  prod: SelectedEnvironmentData;
+}
+
+export const envPayload: EnvironmentPayload = {
   dev: {
     credentials: {
       base_url: 'https://pho-palace.upco.co/wp-json/wc/v2',
@@ -38,18 +54,3 @@ export const ENV = {
     pageSize: 100,
   },
 };
-
-const getEnvVars = (env = 'staging') => {
-  // What is __DEV__ ?
-  // This variable is set to true when react-native is running in Dev mode.
-  // __DEV__ is true when run locally, but false when published.
-  if (__DEV__) {
-    return ENV.dev;
-  } else if (env === 'staging') {
-    return ENV.staging;
-  } else if (env === 'prod') {
-    return ENV.prod;
-  }
-};
-
-export default getEnvVars;

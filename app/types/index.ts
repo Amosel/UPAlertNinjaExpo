@@ -4,6 +4,9 @@ import {
   consumer_key,
   consumer_secret,
   base_url,
+  DEV,
+  PRODUCTION,
+  STAGING,
 } from '../constants';
 
 const BackendDate = types.custom<Date, string>({
@@ -291,3 +294,23 @@ export type UserObject = Credentials & {
 };
 
 export type PartialUser = Partial<UserObject>;
+
+export const CredentialsModel = types.model('EnvCredentials', {
+  base_url: types.string,
+  consumer_key: types.string,
+  consumer_secret: types.string,
+  phone_number: types.string,
+});
+
+export const EnvModel = types.model('Env', {
+  credentials: CredentialsModel,
+  filter: Filter,
+  pageSize: types.number,
+  environment: types.enumeration([DEV, PRODUCTION, STAGING]),
+  isOverrid: types.optional(types.boolean, false),
+});
+
+export type EnvType = Instance<typeof EnvModel>;
+export type EnvSnapshot = SnapshotIn<typeof EnvModel>;
+
+export type EnvKeyType = typeof DEV | typeof STAGING | typeof PRODUCTION;

@@ -8,7 +8,7 @@ import {
 } from 'mobx-state-tree';
 import {isEqual} from 'lodash';
 import {AppState, AppStateStatus} from 'react-native';
-import {Credentials} from '../types';
+import {Credentials, EnvModel} from '../types';
 import {wipeStorage, persistStorage} from '../services/general.storage';
 import {
   persistCredentials,
@@ -21,8 +21,9 @@ import {
   initialSnapsot,
   hasDataToPersist,
 } from './order-store';
-import {getEnv, EnvModel} from './env.mst';
 import {reaction} from 'mobx';
+import {getEnv} from './getEnv';
+import {envPayload} from '../../environment';
 
 const log = console.log;
 // const log = (_message?: any, ..._optionalParams: any[]) => {};
@@ -124,7 +125,7 @@ export async function restoreApp() {
   log('Restoring app');
   const [credentials, env] = await Promise.all([
     restoreCredentials(/* true will force wiping the credentials that were saved from last session */),
-    getEnv(),
+    getEnv(envPayload),
   ]);
   let snapshot: AppSnapshot = {
     credentials,
