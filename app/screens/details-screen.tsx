@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {SafeAreaView, Text, View, FlatList, Image} from 'react-native';
+import {SafeAreaView, Text, View, FlatList} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {Button} from 'react-native-elements';
 import styles, {colors} from '../styles';
@@ -18,10 +18,6 @@ import {isCompleted} from '../model';
 function DetailsScreenHeader() {
   return (
     <View>
-      <Image
-        style={styles.imageSMLogo}
-        source={require('../assets/logo-small.png')}
-      />
       <Text style={styles.logoText}>ORDER DETAIL</Text>
     </View>
   );

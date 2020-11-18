@@ -5,3 +5,4 @@ export * from './order-details-header-view';
 export * from './order-item';
 export * from './orders-list';
 export * from './settings-button';
+export * from './logo-title';

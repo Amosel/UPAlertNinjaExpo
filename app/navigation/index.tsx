@@ -2,20 +2,19 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import * as Screens from '../screens';
-import {DismissButton, SettingsButton} from '../components';
+import {DismissButton, SettingsButton, LogoTitle} from '../components';
 import {colors} from '../styles';
 import {useCredentials} from '../provider';
 import {observer} from 'mobx-react';
 
-function HomeStack() {
+function OrdersStack() {
   const {Screen, Navigator} = createStackNavigator();
   return (
     <Navigator>
       <Screen
-        name="Home"
+        name="Orders"
         component={Screens.HomeScreen}
         options={{
-          title: 'Orders',
           headerRight: () => <SettingsButton />,
           headerTintColor: colors.WHITE,
           headerBackTitle: undefined,
@@ -23,6 +22,7 @@ function HomeStack() {
             backgroundColor: colors.PRIMARYBGCOLOR,
             borderBottomWidth: 0,
           },
+          headerTitle: () => <LogoTitle />,
         }}
       />
       <Screen
@@ -30,11 +30,11 @@ function HomeStack() {
         component={Screens.DetailsScreen}
         options={{
           headerTintColor: colors.WHITE,
-          headerBackTitle: undefined,
           headerStyle: {
             backgroundColor: colors.PRIMARYBGCOLOR,
             borderBottomWidth: 0,
           },
+          headerTitle: () => <LogoTitle />,
         }}
       />
     </Navigator>
@@ -79,7 +79,7 @@ function AppStack() {
     <Navigator mode="modal" screenOptions={{}}>
       <Screen
         name={'Home'}
-        component={HomeStack}
+        component={OrdersStack}
         options={{headerShown: false}}
       />
       <Screen
@@ -101,7 +101,7 @@ export const Root = observer(() => {
       <Navigator mode="modal">
         {credentials ? (
           <Screen
-            name={'HomeStack'}
+            name={'OrdersStack'}
             component={AppStack}
             options={{headerShown: false}}
           />
