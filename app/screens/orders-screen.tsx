@@ -9,7 +9,7 @@ import {ClosedOrdersList, OpenOrderList} from '../components/orders-list';
 import {NoCredentialsComonent} from '../components/empty-orders-list-view';
 import {useCredentials} from '../provider';
 
-const HomeScreenContent = observer(
+const OrdersScreenContent = observer(
   ({selectedIndex}: {selectedIndex: SelectedIndex}) => {
     const credentials = useCredentials();
     if (!credentials) {
@@ -32,7 +32,7 @@ const HomeScreenContent = observer(
   },
 );
 
-export function HomeScreen() {
+export function OrdersScreen() {
   const [selectedIndex, setSelectedIndex] = React.useState<SelectedIndex>(
     SelectedIndex.open,
   );
@@ -49,7 +49,7 @@ export function HomeScreen() {
         selectedIndex={selectedIndex}
         onChange={(index: number) => setSelectedIndex(index as SelectedIndex)}
       />
-      <HomeScreenContent selectedIndex={selectedIndex} />
+      <OrdersScreenContent selectedIndex={selectedIndex} />
     </SafeAreaView>
   );
 }

@@ -13,7 +13,7 @@ function OrdersStack() {
     <Navigator>
       <Screen
         name="Orders"
-        component={Screens.HomeScreen}
+        component={Screens.OrdersScreen}
         options={{
           headerRight: () => <SettingsButton />,
           headerTintColor: colors.WHITE,
