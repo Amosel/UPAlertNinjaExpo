@@ -36,7 +36,7 @@ import {
   isCompleted,
 } from '../../model';
 import {getOrders, updateOrder} from '../../services/woo.commerce.endpoints';
-import { POLL_DELAY } from '../../constants'
+import {POLL_DELAY} from '../../constants';
 const log = console.log;
 // const log = (_message?: any, ..._optionalParams: any[]) => {};
 
