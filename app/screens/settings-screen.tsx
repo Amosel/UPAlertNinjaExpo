@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {SafeAreaView, Image, Text, View} from 'react-native';
+import {SafeAreaView, Text, View} from 'react-native';
 import {Button} from 'react-native-elements';
 import {useNavigation} from '@react-navigation/native';
 import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-view';
@@ -10,6 +10,7 @@ import {CredentialsInputView} from '../components/credentials-input-view';
 import {VersionView} from '../components/version-view';
 import styles, {colors} from '../styles';
 import {useCredentialForm} from '../hooks';
+import {Branding} from '../components';
 
 export const SettingsScreen = observer(() => {
   const keyboardIsShowing = useKeyboard();
@@ -21,16 +22,9 @@ export const SettingsScreen = observer(() => {
         <KeyboardAvoidingScrollView keyboardDismissMode="on-drag">
           {keyboardIsShowing ? null : (
             <View style={styles.imageContainer}>
-              <Image
-                style={styles.imageLogo}
-                source={require('../assets/logo.png')}
-              />
+              <Branding />
             </View>
           )}
-          <View style={styles.textContainer}>
-            <Text style={styles.textTitle}>Restaurant</Text>
-            <Text style={styles.textSubTitle}>NINJA</Text>
-          </View>
           <CredentialsInputView {...{handleChange, userInput}} />
           <Button
             disabled={!canSave}

@@ -6,3 +6,4 @@ export * from './order-item';
 export * from './orders-list';
 export * from './settings-button';
 export * from './logo-title';
+export * from './branding';

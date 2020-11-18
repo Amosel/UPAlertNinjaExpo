@@ -46,11 +46,12 @@ function SettingsStack() {
   return (
     <Navigator>
       <Screen
-        name="SettingsHome"
+        name="Settings"
         component={Screens.SettingsScreen}
         options={{
           headerRight: () => <DismissButton />,
           headerLeft: () => null,
+          title: '',
           headerTintColor: colors.WHITE,
           headerStyle: {
             backgroundColor: colors.PRIMARYBGCOLOR,
