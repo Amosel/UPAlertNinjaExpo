@@ -64,7 +64,12 @@ export const OrderListEmptyComponent = observer(
     } else if (error) {
       return (
         <EmptyOrderListView
-          texts={[{text: error.message, style: styles.body}]}
+          texts={[
+            {
+              text: `${error.message.substring(0, 100)}\n...`,
+              style: styles.body,
+            },
+          ]}
           button={{
             onPress: fetchOrders,
             title: 'Retry',
