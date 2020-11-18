@@ -234,21 +234,33 @@ export const OrdersStore = types
           {orderby, per_page, order},
           self.requestBase,
         );
-        const _lastResponseObj = createRespnseObjFromOrders(orders);
-        if (_lastResponseObj?.hash === lastResponseObj?.hash) {
-          logs.push('Done, no new orders, setting state to DONE');
+        if (!Array.isArray(orders)) {
+          const error = new Error(`Unexpected Server Response: \n${orders}`);
+          self.setDone({
+            type: 'failed',
+            error: {
+              errorType: errorTypes.UNEXPECTED_PAYLOAD,
+              message: error.message || 'unknown',
+            },
+            logs: [...logs, `Request failed, ${error.message || 'unknown'}`],
+          });
         } else {
-          logs.push('Done, setting orders and updaing state to DONE');
-          lastResponseObj = _lastResponseObj;
-          const update = self.updateOrders(orders);
-          handlePostUpdate(update);
+          const _lastResponseObj = createRespnseObjFromOrders(orders);
+          if (_lastResponseObj?.hash === lastResponseObj?.hash) {
+            logs.push('Done, no new orders, setting state to DONE');
+          } else {
+            logs.push('Done, setting orders and updaing state to DONE');
+            lastResponseObj = _lastResponseObj;
+            const update = self.updateOrders(orders);
+            handlePostUpdate(update);
+          }
+          const delta = Date.now() - prevTime;
+          prevTime = Date.now();
+          self.setDone({
+            type: 'success',
+            delta,
+          });
         }
-        const delta = Date.now() - prevTime;
-        prevTime = Date.now();
-        self.setDone({
-          type: 'success',
-          delta,
-        });
       } catch (error) {
         self.setDone({
           type: 'failed',

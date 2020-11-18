@@ -186,6 +186,7 @@ export const OrdersArray = types.array(OrderModel);
 
 export const errorTypes = {
   NETOWRK_ERROR: 'Network Error',
+  UNEXPECTED_PAYLOAD: 'Unexpected payload',
   UNKNOWN: 'Unknown',
 };
 
